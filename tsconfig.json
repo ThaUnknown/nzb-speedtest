@@ -1,0 +1,38 @@
+{
+  "extends": "eslint-config-standard-universal/tsconfig.json",
+  "compilerOptions": {
+    "rewriteRelativeImportExtensions": false,
+    "verbatimModuleSyntax": false,
+    "outDir": null,
+    "noEmit": true,
+    "noImplicitAny": false,
+    // "types": [
+    //   "./src/types"
+    // ]
+  },
+  "include": [
+    "./*.ts",
+    "./*.js",
+    "./src/**/*.ts",
+    "./src/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "build",
+    "scripts",
+    "test",
+    "tests",
+    "**/*.spec.ts",
+    "android",
+    "nodejs-mobile",
+    "public"
+  ],
+  "ts-node": {
+    "esm": true,
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
+}

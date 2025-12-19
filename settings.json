@@ -1,0 +1,9 @@
+[
+  {
+    "domain": "nzb-speedtest.local",
+    "login": "admin",
+    "password": "admin1",
+    "threads": 1,
+    "connectionsPerThread": 20
+  }
+]
