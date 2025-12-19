@@ -9,7 +9,7 @@ import type NZBWorker from './worker.ts'
 import type { Remote } from 'abslink'
 
 try {
-  const settings = (await import('./settings.json', { with: { type: 'json' } })).default
+  const settings = JSON.parse(await readFile('./settings.json', 'utf-8'))
   console.log('starting client with settings', settings)
 
   const nzbFile = argv[2]
