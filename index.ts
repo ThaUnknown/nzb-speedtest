@@ -13,12 +13,13 @@ try {
   console.log('starting client with settings', settings)
 
   const nzbFile = argv[2]
-
   if (!nzbFile) {
     throw new Error('No NZB file provided. Usage: node index.ts <path-to-nzb-file>')
   }
 
   const nzbcontents = await readFile(nzbFile, 'utf-8')
+
+  console.log('NZB file read, parsing...')
 
   const { files } = parse(nzbcontents)
 
@@ -31,9 +32,9 @@ try {
     for (let i = 0; i < config.threads; i++) {
       const batchOffset = i * batchSize
       const worker = new Worker(new URL('./worker.ts', import.meta.url))
-
       const nzbWorker = await new (wrap<typeof NZBWorker>(worker))(batchOffset, batchSize)
       await nzbWorker.init(nzbcontents, config.domain, config.login, config.password, config.connectionsPerThread)
+      console.log('worker ready')
       workers.push(nzbWorker)
     }
   }

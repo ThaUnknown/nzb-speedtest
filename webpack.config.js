@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 
-import webpack from 'webpack'
+// import webpack from 'webpack'
 import 'webpack-dev-server'
 
 const dirname = import.meta.dirname || new URL('.', import.meta.url).pathname
@@ -10,11 +10,6 @@ const config = [
   {
     mode: 'development',
     devtool: 'source-map',
-    optimization: {
-      minimize: false,
-      moduleIds: 'named',
-      chunkIds: 'named'
-    },
     entry: [join(dirname, 'index.ts')],
     output: {
       path: join(dirname, 'build'),
@@ -56,12 +51,12 @@ const config = [
       },
       hot: false,
       client: false
-    },
-    plugins: [
-      new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1
-      })
-    ]
+    }
+    // plugins: [
+    //   new webpack.optimize.LimitChunkCountPlugin({
+    //     maxChunks: 1
+    //   })
+    // ]
   }
 ]
 

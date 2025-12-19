@@ -5,41 +5,6 @@ import fromNZB, { type NNTPFile } from 'nzb-file/src'
 
 import type { Pool } from 'nzb-file/src/pool'
 
-async function * parallel<T> (
-  source: AsyncIterable<T>,
-  concurrency: number
-): AsyncGenerator<T> {
-  if (!Number.isInteger(concurrency) || concurrency <= 0) {
-    throw new RangeError('concurrency must be a positive integer')
-  }
-
-  const iterator = source[Symbol.asyncIterator]()
-  const inFlight = new Set<Promise<IteratorResult<T>>>()
-  let reachedDone = false
-
-  const startOne = () => {
-    if (reachedDone) return
-    const p = iterator.next()
-    inFlight.add(p)
-    p.finally(() => inFlight.delete(p))
-  }
-
-  // prime the pool
-  while (inFlight.size < concurrency) startOne()
-
-  while (inFlight.size) {
-    const result = await Promise.race(inFlight)
-
-    if (result.done) {
-      reachedDone = true
-      continue
-    }
-
-    yield result.value
-    startOne()
-  }
-}
-
 export default expose(class NZBWorker {
   pool?: Pool
   largestFile?: NNTPFile
@@ -73,10 +38,19 @@ export default expose(class NZBWorker {
     if (!this.poolSize) throw new Error('Pool size unknown')
 
     const data = this.largestFile.slice(this.offset, this.offset + this.length)
+    console.log(`Worker downloading ${data.size} bytes from offset ${this.offset} using pool size ${this.poolSize}`)
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for await (const chunk of parallel(data, this.poolSize)) {
-      // :)
+    const slices: Array<Promise<void>> = []
+    for (let i = 0; i < this.poolSize; i++) {
+      const sliceStart = i * Math.ceil(data.size / this.poolSize)
+      const sliceEnd = Math.min(data.size, (i + 1) * Math.ceil(data.size / this.poolSize))
+      slices.push((async () => {
+        for await (const chunk of data.slice(sliceStart, sliceEnd)) {
+          // just consume the data
+        }
+      })())
     }
+
+    await Promise.all(slices)
   }
 }, parentPort!)
