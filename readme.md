@@ -4,7 +4,7 @@ maxxing out 10Gbit/s speeds using nzb providers, for fun ^^
 
 ```bash
 npm install
-npm run build
+npm run build:webpack
 
 node build/index.js <path to nzb file>
 ```
